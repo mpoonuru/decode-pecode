@@ -1,0 +1,89 @@
+import FS_MAPPER_ENGINE:*;
+
+Local string &trgCharSet, &srcCharset;
+Local File &trgFileObj, &srcFileObj;
+Local number &Return_code;
+Local number &Mapper_message_catalog;
+Local string &Mapper_id;
+Local string &Message;
+Local string &Filename;
+
+&trgCharSet = "";
+&srcCharset = "";
+&trgFileObj = Null;
+&srcFileObj = Null;
+&Mapper_message_catalog = 6162;
+
+&Mapper_id = "GTA_EXP";
+/*Create mapper engine*/
+&mapEngine = create FS_MAPPER_ENGINE:MapperEngine();
+/*Get mapper type by Mapper ID*/
+&mapperType = &mapEngine.GetMapperType(&Mapper_id);
+
+/*Get mapper target charset*/
+&mapEngine.GetmapperFileCharSet(&Mapper_id, &srcCharset, &trgCharSet);
+
+/*Define file name*/
+&Filename = "ExpInv_" | "_" | Year(%Date) | Month(%Date) | Day(%Date) | Hour(%Time) | Minute(%Time) | Second(%Time) | "_" | BI_GTA_EXP_AET.VAT_INVOICE_TYPE.Value | ".txt";
+
+Evaluate &mapperType
+   /*Table to XML
+When "TX"
+*/
+When "TF"
+   /* &trgFileObj = GetFile(FS_MAPPER_AET.FILE_PATH_NAME | FS_MAPPER_AET.FILE_NAME, "W", &trgCharSet, %FilePath_Absolute); */
+   &trgFileObj = GetFile(&Filename, "W", &trgCharSet);
+   
+   /* XML to Table
+When "XT"
+/*File to Table
+When "FT"
+*/
+End-Evaluate;
+
+/* &crits = Split(FS_MAPPER_AET.FS_MAP_CRITS, "~~"); */
+&criterias = create FS_MAPPER_ENGINE:Criterias(&Mapper_id);
+&criterias.setValueToVar("GTA_INV_EXP.BI_GTA_INV_HDR.BUSINESS_UNIT", ":1", BI_GTA_EXP_AET.BUSINESS_UNIT);
+&criterias.setValueToVar("GTA_INV_EXP.BI_GTA_INV_HDR.VAT_INVOICE_TYPE", ":2", BI_GTA_EXP_AET.VAT_INVOICE_TYPE);
+If All(BI_GTA_EXP_AET.BATCH_CODE) Then
+   &criterias.setValueToVar("GTA_INV_EXP.BI_GTA_INV_HDR.BATCH_CODE", ":3", BI_GTA_EXP_AET.BATCH_CODE);
+End-If;
+If All(BI_GTA_EXP_AET.INVOICE_DT_FROM) And
+      All(BI_GTA_EXP_AET.INVOICE_DT_TO) Then
+   &criterias.setValueToVar("GTA_INV_EXP.BI_GTA_INV_HDR.INVOICE_DT", ":4", String(BI_GTA_EXP_AET.INVOICE_DT_FROM));
+   &criterias.setValueToVar("GTA_INV_EXP.BI_GTA_INV_HDR.INVOICE_DT", ":5", String(BI_GTA_EXP_AET.INVOICE_DT_TO));
+End-If;
+If All(BI_GTA_EXP_AET.FROM_INVOICE) And
+      All(BI_GTA_EXP_AET.TO_INVOICE) Then
+   &criterias.setValueToVar("GTA_INV_EXP.BI_GTA_INV_HDR.GTA_INVOICE", ":6", BI_GTA_EXP_AET.FROM_INVOICE);
+   &criterias.setValueToVar("GTA_INV_EXP.BI_GTA_INV_HDR.GTA_INVOICE", ":7", BI_GTA_EXP_AET.TO_INVOICE);
+End-If;
+/*Fixed criteria, the exported adapter invoice must be ready status*/
+&criterias.setValueToVar("GTA_INV_EXP.BI_GTA_INV_HDR.GTA_STATUS", ":8", "RDY");
+
+
+&trgFileObj.WriteLine("SJJK0101~~销售单据传入~~Peoplesoft");
+/* Create Exception handler*/
+&handler = create FS_MAPPER_ENGINE:DefaultExceptionHandler();
+/* Call Mapper for generate flat file, return code indicate the mapper sucessful or not*/
+&Return_code = &mapEngine.ProcessMapper(BI_GTA_EXP_AET.OPRID, BI_GTA_EXP_AET.RUN_CNTL_ID, &Mapper_id, &srcFileObj, &trgFileObj, &criterias, &handler);
+/*Get mapper message by mapper return code*/
+&Message = MsgGet(&Mapper_message_catalog, &Return_code, "");
+WriteToLog(%ApplicationLogFence_Level1, &Message);
+
+/*If Mapper run sucessfully*/
+If &Return_code = 22 Then
+   BI_GTA_EXP_AET.FLAG = "Y";
+Else
+   BI_GTA_EXP_AET.FLAG = "N";
+End-If;
+
+
+If &srcFileObj <> Null Then
+   &srcFileObj.Close();
+End-If;
+
+If &trgFileObj <> Null Then
+   &trgFileObj.Close();
+End-If;
+&handler.close();
