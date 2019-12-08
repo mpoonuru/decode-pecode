@@ -157,7 +157,7 @@ public class ProjectReader
 
 	/**
 	 * Read the .xml project file, which is not a valid XML file because it has more than one root element.
-	 * For this reason, read the project file line for line, create a temporary XML file for each <instance> block, 
+	 * For this reason, read the project file line for line, create a temporary XML file for each instance block,
 	 * and process that file. 
 	 */
 	public PeopleToolsProject readProject( File file) throws IOException, SAXException, ParserConfigurationException

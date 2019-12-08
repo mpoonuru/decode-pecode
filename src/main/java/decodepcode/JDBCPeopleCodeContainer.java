@@ -146,7 +146,7 @@ public class JDBCPeopleCodeContainer extends PeopleCodeContainer implements Peop
 	 * @param rs ResultSet containing key info for the PCMPROG row(s)to be read; this ResultSet may or may not come
 	 * 			from the same database as the Connection parameter
 	 * @param canAccessPROGTXT if true, get plain text from PSPROGTEXT
-	 * @param sourceDB  
+	 * @param dbName
 	 */
 	public JDBCPeopleCodeContainer( Connection dbconn, 
 			String dbowner, 

@@ -2,6 +2,10 @@ plugins {
     id 'java'
 }
 
+plugins {
+    id "com.jfrog.bintray" version "1.7"
+}
+
 group 'decodepcode'
 version '0.0.1'
 
@@ -11,12 +15,14 @@ allprojects {
         targetCompatibility = '1.7'
     }
     apply plugin: 'java'
+    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
 }
 
 // Include dependent libraries in archive.
 
 
-task buildJar(type: Jar) {
+task fatJar(type: Jar) {
     classifier = 'fat'
     manifest {
         attributes "Main-Class": "decodepcode.Controller"
@@ -27,6 +33,17 @@ task buildJar(type: Jar) {
         exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF'
     }
     with jar
+}
+
+task sourceJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    javadoc.options.encoding = 'UTF-8'
+    from javadoc.destinationDir
 }
 
 repositories {
