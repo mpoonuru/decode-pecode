@@ -5,7 +5,29 @@ plugins {
 group 'decodepcode'
 version '0.0.1'
 
-sourceCompatibility = 1.8
+allprojects {
+    tasks.withType(JavaCompile) {
+        sourceCompatibility = '1.7'
+        targetCompatibility = '1.7'
+    }
+    apply plugin: 'java'
+}
+
+// Include dependent libraries in archive.
+
+
+task buildJar(type: Jar) {
+    classifier = 'fat'
+    manifest {
+        attributes "Main-Class": "decodepcode.Controller"
+    }
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    } {
+        exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF'
+    }
+    with jar
+}
 
 repositories {
     mavenCentral()
