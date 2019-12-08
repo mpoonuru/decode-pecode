@@ -3,7 +3,7 @@ plugins {
 }
 
 plugins {
-    id "com.jfrog.bintray" version "1.7"
+    id "com.jfrog.bintray" version "1.8.4"
 }
 
 group 'decodepcode'
@@ -20,7 +20,6 @@ allprojects {
 }
 
 // Include dependent libraries in archive.
-
 
 task fatJar(type: Jar) {
     classifier = 'fat'
@@ -44,6 +43,58 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     javadoc.options.encoding = 'UTF-8'
     from javadoc.destinationDir
+}
+
+publishing {
+    publications {
+        MyPublication(MavenPublication) {
+            from components.java
+            groupId 'decodepcode'
+            artifactId 'DecodePcode'
+            version this.version
+
+            artifact sourceJar {
+                classifier "sources"
+            }
+
+            artifact javadocJar {
+                classifier "javadoc"
+            }
+
+            artifact fatJar {
+                classifier "fat"
+            }
+
+        }
+    }
+}
+
+bintray{
+    user=System.getenv('BINTRAY_USER')
+    key=System.getenv('BINTRAY_API_KEY')
+//    configurations = ['archives']
+    publications = ['MyPublication']
+    pkg {
+        repo = 'Maven'
+        name = 'Decode-Pcode'
+        licenses = ['ISC']
+        websiteUrl = 'https://github.com/techops-bob/decode-pecode'
+        issueTrackerUrl = 'https://github.com/techops-bob/decode-pecode/issues'
+        desc = 'An opensource library to backup PeopleSoft-Code to your desired source control systems.'
+        vcsUrl = 'https://github.com/techops-bob/decode-pecode.git'
+        githubRepo = 'techops-bob/decode-pecode'
+        githubReleaseNotesFile = 'README.md'
+        labels = ['VCS', 'PeopleSoft']
+        publicDownloadNumbers = true
+
+        version {
+            released  = new Date()
+            name = this.version
+            desc = 'Published PeopleSoft version control tool'
+            vcsTag = this.version
+        }
+
+    }
 }
 
 repositories {
