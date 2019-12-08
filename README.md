@@ -1,11 +1,12 @@
-#DECODE PCODE
+# DECODE PCODE
+[ ![Download](https://api.bintray.com/packages/sachinsh76/Maven/Decode-Pcode/images/download.svg) ](https://bintray.com/sachinsh76/Maven/Decode-Pcode/_latestVersion)
 - This repository was taken and modified from https://sourceforge.net/projects/decodepcode/, which is maintained by Eric H.
 - The current version is a gradle project with all dependencies pre-installed, to be used from a command line, to extract PeopleCode and SQL text from either a PeopleTools project file or directly from PeopleTools tables (using direct, read-only database access).
-- To generate executable fat jar file (with all dependencies), clone the project and run following commands  
+- You can either download fat-jar or generate executable fat jar using
 
 ```cmd
     ./gradlew build
-    ./gradlew buildJar
+    ./gradlew fatJar
 ```
 
 - It will generate jar file under build/libs directory. 
