@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import decodepcode.Variables;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
@@ -533,9 +534,8 @@ public class MergePeopleCodeTrees
     }
     
     public static void doExtractAndMergeCompareReports( File compareDir, 
-    		String oldDemo, String newDemo, String oldDev) 
-    			throws SAXException, IOException, ParserConfigurationException, TransformerException, SVNException 
-    {
+    		String oldDemo, String newDemo, String oldDev)
+			throws SAXException, IOException, ParserConfigurationException, TransformerException, SVNException, Variables.ValidationException {
     	Properties props = Controller.readProperties();
     	String GNUdiff = props.getProperty("GNUdiff"),
     		GNUpatch = props.getProperty("GNUpatch");

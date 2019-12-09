@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Properties;
 
 import decodepcode.Controller;
+import decodepcode.Variables;
 
 public class RunExternalDiffProgram 
 {
@@ -78,8 +79,7 @@ public class RunExternalDiffProgram
 		return w.toString();
 	}
 	
-	public RunExternalDiffProgram() throws IOException, InterruptedException
-	{
+	public RunExternalDiffProgram() throws IOException, InterruptedException, Variables.ValidationException {
     	Properties props = Controller.readProperties();
     	String GNUdiff = props.getProperty("GNUdiff");
     	if (GNUdiff != null)

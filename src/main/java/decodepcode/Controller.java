@@ -30,6 +30,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.function.BiConsumer;
 import java.util.logging.Logger;
 
 import decodepcode.JDBCPeopleCodeContainer.KeySet;
@@ -83,9 +84,9 @@ public class Controller {
 			getContentHtml = "true".equalsIgnoreCase(props.getProperty("getContentHtml"));
 			getContentImage = "true".equalsIgnoreCase(props.getProperty("getContentImage"));
 			saveCodeInfo = "true".equalsIgnoreCase(props.getProperty("saveCodeInfo"));
-		} catch (IOException ex)
+		} catch (Variables.ValidationException ex)
 		{
-			logger.severe("Unable to read properties : " + ex);
+			logger.severe("Unable to find required properties/variables: " + ex);
 		}
 	}
 
@@ -722,10 +723,8 @@ from PSSQLDEFN d, PSSQLTEXTDEFN td where d.SQLID=td.SQLID
 		return getPeopleCodeContainers( where, false);
 	}
 
-	public static Properties readProperties() throws IOException
-	{
-		Properties props= new Properties();
-		props.load(new FileInputStream("DecodePC.properties"));
+	public static Properties readProperties() throws Variables.ValidationException {
+		Properties props = new Variables().loadAsProperties();
 		dbowner = props.getProperty("dbowner");
 		dbowner = dbowner == null? "" : dbowner + ".";
 		return props;
