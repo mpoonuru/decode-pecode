@@ -33,12 +33,10 @@ public class Variables {
 
     private static Map<String, String> loadFromEnvironment() {
         Map<String, String> env = System.getenv();
-        // Java
-        // Classic way to loop a map
         Map<String, String> envVariables = new HashMap<>();
         for (Map.Entry<String, String> entry : env.entrySet()) {
-            if (entry.getKey().startsWith("DP")) {
-                String mappedKey = entry.getKey().split("_")[1].toLowerCase();
+            if (entry.getKey().startsWith("dp") || entry.getKey().startsWith("DP")) {
+                String mappedKey = entry.getKey().split("_")[1];
                 envVariables.put(mappedKey, entry.getValue());
             }
         }
