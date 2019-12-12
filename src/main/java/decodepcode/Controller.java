@@ -11,6 +11,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -35,6 +36,8 @@ import java.util.logging.Logger;
 
 import decodepcode.JDBCPeopleCodeContainer.KeySet;
 import decodepcode.JDBCPeopleCodeContainer.StoreInList;
+import decodepcode.git.GitPusher;
+import org.eclipse.jgit.api.errors.GitAPIException;
 
 /**
  *
@@ -1352,7 +1355,19 @@ from PSSQLDEFN d, PSSQLTEXTDEFN td where d.SQLID=td.SQLID
 			logger.severe(e.getMessage());
 			e.printStackTrace();
 		}
+
+		if (props.containsKey("enableGitPush")) {
+			pushCode(props);
+		}
 	}
 
-
+	public static void pushCode(Properties props) {
+		String gitFolderPath = props.getProperty("gitdir");
+		try {
+			GitPusher pusher = new GitPusher(gitFolderPath);
+			pusher.push(props);
+		} catch (IOException | GitAPIException | URISyntaxException e) {
+			e.printStackTrace();
+		}
+	}
 }
