@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'decodepcode'
-version '0.0.1'
+version '0.0.2'
 
 allprojects {
     tasks.withType(JavaCompile) {

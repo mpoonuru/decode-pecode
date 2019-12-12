@@ -6,6 +6,7 @@ import org.eclipse.jgit.api.PullCommand;
 import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.lib.TextProgressMonitor;
 import org.eclipse.jgit.transport.PushResult;
 import org.eclipse.jgit.transport.RemoteRefUpdate;
@@ -25,7 +26,8 @@ public class GitPusher {
         this.git = Git.open(new File(folderPath));
     }
 
-    public void push(Properties props) throws GitAPIException, URISyntaxException {
+    //todo : setup upstream for the master while fetching data for the first time
+    public void push(Properties props) throws URISyntaxException, GitAPIException {
         git.remoteAdd().setName("origin").setUri(new URIish(props.getProperty("gitRemoteUrl"))).call();
         PullCommand pullCommand;
         PushCommand pushCommand;
@@ -44,13 +46,17 @@ public class GitPusher {
             pushCommand = Authenticator.authenticatedPushCommand(git, username, password);
         }
 
-        System.out.println("Pulling code from repo ");
-        PullResult pullResult = pullCommand.setRebase(true)
-                .setProgressMonitor(new TextProgressMonitor(new PrintWriter(System.out)))
-                .call();
+        try {
+            System.out.println("Pulling code from repo ");
+            PullResult pullResult = pullCommand.setRebase(true)
+                    .setProgressMonitor(new TextProgressMonitor(new PrintWriter(System.out)))
+                    .call();
+            System.out.println(pullResult.toString());
+            System.out.println("Completed pulling code from repo ");
 
-        System.out.println(pullResult.toString());
-        System.out.println("Completed pulling code from repo ");
+        } catch (GitAPIException e) {
+            e.printStackTrace();
+        }
 
         System.out.println("\nPushing code to the repo ");
         Iterable<PushResult> pushResults = pushCommand.setRemote("origin")

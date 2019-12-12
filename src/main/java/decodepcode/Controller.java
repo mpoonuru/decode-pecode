@@ -1165,8 +1165,8 @@ from PSSQLDEFN d, PSSQLTEXTDEFN td where d.SQLID=td.SQLID
 	 *  Arguments: project name, or 'since' + date (in yyyy/MM/dd format), or 'since-days' + #days, or 'custom'"
 	 * @param a
 	 */
-	public static void main(String[] a)
-	{
+
+	public static void extractCode(String[] a) {
 		try {
 			if (a.length == 0 || !a[0].startsWith("Process"))
 				throw new IllegalArgumentException("First argument should be ProcessToFile or similar");
@@ -1219,7 +1219,7 @@ from PSSQLDEFN d, PSSQLTEXTDEFN td where d.SQLID=td.SQLID
 				{
 					String ancestor = "Base".equals(p.getTag())?
 							props.getProperty("ancestor")
-						:
+							:
 							props.getProperty("ancestor" + p.getTag());
 					if (ancestor != null)
 					{
@@ -1247,10 +1247,10 @@ from PSSQLDEFN d, PSSQLTEXTDEFN td where d.SQLID=td.SQLID
 						p.readProject( f);
 						writeStats();
 					}
-					if (!found) {
-						logger.severe("There is no target environment labeled '" + target + "' - file not processed");
-					}
-					return;
+				if (!found) {
+					logger.severe("There is no target environment labeled '" + target + "' - file not processed");
+				}
+				return;
 			}
 
 			// not reading project, so need to have JDBC Connection to read bytecode
@@ -1355,19 +1355,24 @@ from PSSQLDEFN d, PSSQLTEXTDEFN td where d.SQLID=td.SQLID
 			logger.severe(e.getMessage());
 			e.printStackTrace();
 		}
+	}
 
+
+	public static void pushCode(Properties props) {
 		if (props.containsKey("enableGitPush")) {
-			pushCode(props);
+			String gitFolderPath = props.getProperty("gitdir");
+			try {
+				GitPusher pusher = new GitPusher(gitFolderPath);
+				pusher.push(props);
+			} catch (IOException | GitAPIException | URISyntaxException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
-	public static void pushCode(Properties props) {
-		String gitFolderPath = props.getProperty("gitdir");
-		try {
-			GitPusher pusher = new GitPusher(gitFolderPath);
-			pusher.push(props);
-		} catch (IOException | GitAPIException | URISyntaxException e) {
-			e.printStackTrace();
-		}
+	public static void main(String[] a)
+	{
+		extractCode(a);
+		pushCode(props);
 	}
 }
