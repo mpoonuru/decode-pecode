@@ -12,6 +12,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -74,7 +75,7 @@ public class Controller {
 	static boolean saveCodeInfo;
 	static String oprid = null;
 	static boolean onlyCustom = false;
-	final static File lastTimeFile = new File("last-time.txt");
+	static File lastTimeFile;
 	private static Set<String> recsProcessed = new HashSet<>(); // for SQL and CONT IDs
 	private static Map<String, CONTobject> contMap = new HashMap<>(); // for CONT objects
 
@@ -84,6 +85,7 @@ public class Controller {
 		try
 		{
 			props= readProperties();
+			lastTimeFile= getLastFile(props);
 			getContentHtml = "true".equalsIgnoreCase(props.getProperty("getContentHtml"));
 			getContentImage = "true".equalsIgnoreCase(props.getProperty("getContentImage"));
 			saveCodeInfo = "true".equalsIgnoreCase(props.getProperty("saveCodeInfo"));
@@ -91,6 +93,11 @@ public class Controller {
 		{
 			logger.severe("Unable to find required properties/variables: " + ex);
 		}
+	}
+
+	static File getLastFile(Properties props) {
+		String lastTimeFilePath = props.getProperty("lastTimeFilePath", ".") + File.separator;
+		return new File(lastTimeFilePath + "last-time.txt");
 	}
 
 	public static List<PeopleCodeObject> getPeopleCodeContainers(String whereClause, boolean queryAllConnections) throws ClassNotFoundException, SQLException
