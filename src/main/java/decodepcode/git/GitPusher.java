@@ -28,6 +28,15 @@ public class GitPusher {
 
     //todo : setup upstream for the master while fetching data for the first time
     public void push(Properties props) throws URISyntaxException, GitAPIException {
+
+        // TODO: 16/12/19 add proper author and committer for last-time.txt file
+        if(props.getProperty("gitdir").equals(props.getProperty("lastTimeFilePath"))) {
+            git.add().addFilepattern("last-time.txt").call();
+            git.commit().setMessage("added last time file to track job scheduling")
+                    .setAuthor("CoolDude", "coold@noorg.com")
+                    .call();
+        }
+
         git.remoteAdd().setName("origin").setUri(new URIish(props.getProperty("gitRemoteUrl"))).call();
         PullCommand pullCommand;
         PushCommand pushCommand;
@@ -58,10 +67,6 @@ public class GitPusher {
             e.printStackTrace();
         }
 
-        if(props.getProperty("gitdir").equals(props.getProperty("lastTimeFilePath"))) {
-            git.add().addFilepattern("last-time.txt").call();
-            git.commit().setMessage("added last time file to track job scheduling").call();
-        }
 
         System.out.println("\nPushing code to the repo ");
         Iterable<PushResult> pushResults = pushCommand.setRemote("origin")
