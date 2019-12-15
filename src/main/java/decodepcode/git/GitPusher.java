@@ -58,6 +58,11 @@ public class GitPusher {
             e.printStackTrace();
         }
 
+        if(props.getProperty("gitdir").equals(props.getProperty("lastTimeFilePath"))) {
+            git.add().addFilepattern("last-time.txt").call();
+            git.commit().setMessage("added last time file to track job scheduling").call();
+        }
+
         System.out.println("\nPushing code to the repo ");
         Iterable<PushResult> pushResults = pushCommand.setRemote("origin")
                 .add("master")
