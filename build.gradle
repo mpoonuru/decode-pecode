@@ -1,9 +1,10 @@
 plugins {
+    id "com.jfrog.bintray" version "1.8.4"
     id 'java'
 }
 
-plugins {
-    id "com.jfrog.bintray" version "1.8.4"
+repositories {
+    jcenter()
 }
 
 group 'decodepcode'
@@ -95,11 +96,6 @@ bintray{
         }
 
     }
-}
-
-repositories {
-    mavenCentral()
-    jcenter()
 }
 
 dependencies {
