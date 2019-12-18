@@ -3,6 +3,7 @@
 - This repository was taken and modified from https://sourceforge.net/projects/decodepcode/, which is maintained by Eric H.
 - The current version is a gradle project with all dependencies pre-installed, to be used from a command line, to extract PeopleCode and SQL text from either a PeopleTools project file or directly from PeopleTools tables (using direct, read-only database access).
 - You can either download fat-jar or generate executable fat jar using
+* Recommended java version = 1.8
 
 ```cmd
     ./gradlew build
