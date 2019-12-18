@@ -73,8 +73,10 @@ jobs:
 workflows:
   version: 2
   build-test-deploy:
-    - hold-deploy-to-bintray:
-        type: approval
-        requires:
-          - build-test
+    jobs:
+      - build-test
+      - hold-deploy-to-bintray:
+          type: approval
+          requires:
+            - build-test
 
