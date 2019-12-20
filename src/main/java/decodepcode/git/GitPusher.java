@@ -33,7 +33,7 @@ public class GitPusher {
         if(props.getProperty("gitdir").equals(props.getProperty("lastTimeFilePath"))) {
             git.add().addFilepattern("last-time.txt").call();
             git.commit().setMessage("added last time file to track job scheduling")
-                    .setAuthor("CoolDude", "coold@noorg.com")
+                    .setAuthor("DecodePcode", "decodepcode@noorg.com")
                     .call();
         }
 

@@ -55,8 +55,9 @@ public class GitSubmitter
 			if (user == null)
 				user = userMap.get("default");
 			CommitCommand commit = git.commit();
-			commit.setMessage(commitStr).setAuthor(user.user, user.email).setCommitter("Decode Peoplecode", "nobody@dummy.org").call();
+			commit.setMessage(commitStr).setAuthor(user.user, user.email).setCommitter(userMap.get("default").user, userMap.get("default").email).call();
 	    }
+
 	    private boolean fileExistsInRepository( String filePath)
 	    {
 	    	int lastSlash = filePath.lastIndexOf("/");
@@ -163,7 +164,6 @@ public class GitSubmitter
 					e.initCause(se);
 					throw e;
 				}
-				
 			}
 
 			@Override
