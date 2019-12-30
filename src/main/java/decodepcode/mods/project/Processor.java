@@ -30,6 +30,8 @@ public class Processor {
         {
             projects.add(rs.getString("PROJECTNAME"));
         }
+        rs.close();
+        st0.close();
         return projects.toArray(new String[0]);
     }
 

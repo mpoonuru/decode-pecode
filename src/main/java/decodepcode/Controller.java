@@ -1,31 +1,20 @@
 package decodepcode;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.sql.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.Date;
-import java.util.logging.Logger;
-
 import decodepcode.JDBCPeopleCodeContainer.KeySet;
 import decodepcode.JDBCPeopleCodeContainer.StoreInList;
 import decodepcode.git.GitPusher;
 import decodepcode.mods.project.FileProcessor;
 import decodepcode.mods.project.Processor;
 import org.eclipse.jgit.api.errors.GitAPIException;
+
+import java.io.*;
+import java.net.URISyntaxException;
+import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.*;
+import java.util.logging.Logger;
 
 /**
  *
@@ -1358,18 +1347,6 @@ from PSSQLDEFN d, PSSQLTEXTDEFN td where d.SQLID=td.SQLID
 	}
 
 
-	public static void pushCode(Properties props) {
-		if (props.containsKey("enableGitPush")) {
-			String gitFolderPath = props.getProperty("gitdir");
-			try {
-				GitPusher pusher = new GitPusher(gitFolderPath);
-				pusher.push(props);
-			} catch (IOException | GitAPIException | URISyntaxException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
 	public static Timestamp getLastTimeTimeStamp() throws ParseException, IOException {
 		BufferedReader br = new BufferedReader(new FileReader(lastTimeFile));
 		String line = br.readLine();
@@ -1383,18 +1360,42 @@ from PSSQLDEFN d, PSSQLTEXTDEFN td where d.SQLID=td.SQLID
 		return new Timestamp(d.getTime());
 	}
 
+
+	public static void pushCode(Properties props) {
+		if (props.containsKey("enableGitPush")) {
+			String gitFolderPath = props.getProperty("gitdir");
+			try {
+				GitPusher pusher = new GitPusher(gitFolderPath);
+				pusher.push(props);
+			} catch (IOException | GitAPIException | URISyntaxException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 	public static void extractLastChangedProjects(Properties props) {
-		try {
-			String fileName= UUID.randomUUID().toString() + ".json";
-			FileProcessor processor = new FileProcessor(props.getProperty("gitdir"), fileName, "changed-projects");
-			Processor projectProcessor = new Processor(getJDBCconnection(""), lastTimeTimeStamp, props, processor);
-			projectProcessor.process();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (props.containsKey("logChangedProjects")) {
+			String uuid = UUID.randomUUID().toString();
+			try {
+				if (props.containsKey("changedProjectFileName")) {
+						String fileName = props.getProperty("changedProjectFileName");
+						FileProcessor processor = new FileProcessor(props.getProperty("gitdir"), fileName,  uuid, null);
+						Processor projectProcessor = new Processor(getJDBCconnection(""), lastTimeTimeStamp, props, processor);
+						projectProcessor.process();
+
+				} else {
+						String fileName =  uuid + ".json";
+						FileProcessor processor = new FileProcessor(props.getProperty("gitdir"), fileName, uuid, "changed-projects");
+						Processor projectProcessor = new Processor(getJDBCconnection(""), lastTimeTimeStamp, props, processor);
+						projectProcessor.process();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

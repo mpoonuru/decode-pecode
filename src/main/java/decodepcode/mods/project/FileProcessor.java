@@ -7,18 +7,15 @@ public class FileProcessor {
 
     String rootDir;
     String fileName;
+    String uuid;
     @Nullable String dirName;
     public static String recentFileName = "recent.txt";
 
-    public FileProcessor(String rootDir, String fileName, String dirName) {
+    public FileProcessor(String rootDir, String fileName, String uuid, String dirName) {
         this.rootDir = rootDir;
         this.fileName = fileName;
+        this.uuid = uuid;
         this.dirName = dirName;
-    }
-
-    public FileProcessor(String rootDir, String fileName) {
-        this.rootDir = rootDir;
-        this.fileName = fileName;
     }
 
     private String getDirPath() {
@@ -46,7 +43,7 @@ public class FileProcessor {
     public void saveFile(String[] content) throws IOException {
         createProjectsChangedDir();
         FileWriter writer = new FileWriter(getFilePath());
-        Revision revision = new Revision(fileName.split("\\.")[0], content);
+        Revision revision = new Revision(uuid, content);
         writer.write(revision.toString());
         writer.close();
 
