@@ -13,31 +13,18 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.function.BiConsumer;
 import java.util.logging.Logger;
 
 import decodepcode.JDBCPeopleCodeContainer.KeySet;
 import decodepcode.JDBCPeopleCodeContainer.StoreInList;
 import decodepcode.git.GitPusher;
+import decodepcode.mods.project.FileProcessor;
+import decodepcode.mods.project.Processor;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 /**
@@ -76,6 +63,7 @@ public class Controller {
 	static String oprid = null;
 	static boolean onlyCustom = false;
 	static File lastTimeFile;
+	static Timestamp lastTimeTimeStamp;
 	private static Set<String> recsProcessed = new HashSet<>(); // for SQL and CONT IDs
 	private static Map<String, CONTobject> contMap = new HashMap<>(); // for CONT objects
 
@@ -86,12 +74,17 @@ public class Controller {
 		{
 			props= readProperties();
 			lastTimeFile= getLastFile(props);
+			lastTimeTimeStamp = getLastTimeTimeStamp();
 			getContentHtml = "true".equalsIgnoreCase(props.getProperty("getContentHtml"));
 			getContentImage = "true".equalsIgnoreCase(props.getProperty("getContentImage"));
 			saveCodeInfo = "true".equalsIgnoreCase(props.getProperty("saveCodeInfo"));
 		} catch (Variables.ValidationException ex)
 		{
 			logger.severe("Unable to find required properties/variables: " + ex);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -1377,9 +1370,38 @@ from PSSQLDEFN d, PSSQLTEXTDEFN td where d.SQLID=td.SQLID
 		}
 	}
 
+	public static Timestamp getLastTimeTimeStamp() throws ParseException, IOException {
+		BufferedReader br = new BufferedReader(new FileReader(lastTimeFile));
+		String line = br.readLine();
+		br.close();
+		String timeOffset = null;
+		Date d = ProjectReader.df2.parse(line);
+		timeOffset = props.getProperty("last-time-offset");
+		if (timeOffset != null) {
+			d = new Date(d.getTime() - Long.parseLong(timeOffset) * 60 * 1000);
+		}
+		return new Timestamp(d.getTime());
+	}
+
+	public static void extractLastChangedProjects(Properties props) {
+		try {
+			String fileName= UUID.randomUUID().toString();
+			FileProcessor processor = new FileProcessor(props.getProperty("gitdir"), fileName, "changed-projects");
+			Processor projectProcessor = new Processor(getJDBCconnection(""), lastTimeTimeStamp, props, processor);
+			projectProcessor.process();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public static void main(String[] a)
 	{
 		extractCode(a);
+		extractLastChangedProjects(props);
 		pushCode(props);
 	}
 }
