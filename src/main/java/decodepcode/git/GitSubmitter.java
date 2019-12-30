@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.EmptyCommitException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.UnmergedPathsException;
 
@@ -55,7 +56,15 @@ public class GitSubmitter
 			if (user == null)
 				user = userMap.get("default");
 			CommitCommand commit = git.commit();
-			commit.setMessage(commitStr).setAuthor(user.user, user.email).setCommitter(userMap.get("default").user, userMap.get("default").email).call();
+			try {
+				commit.setMessage(commitStr)
+						.setAuthor(user.user, user.email)
+						.setCommitter(userMap.get("default").user, userMap.get("default").email)
+						.setAllowEmpty(false)
+						.call();
+			} catch (EmptyCommitException e) {
+				System.out.println("Avoided making an empty commit");
+			}
 	    }
 
 	    private boolean fileExistsInRepository( String filePath)
