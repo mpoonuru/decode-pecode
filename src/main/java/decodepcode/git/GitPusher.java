@@ -29,11 +29,22 @@ public class GitPusher {
     //todo : setup upstream for the master while fetching data for the first time
     public void push(Properties props) throws URISyntaxException, GitAPIException {
 
+        // TODO: 30/12/19 separate committer code from pusher code
         // TODO: 16/12/19 add proper author and committer for last-time.txt file
         if(props.getProperty("gitdir").equals(props.getProperty("lastTimeFilePath"))) {
             git.add().addFilepattern("last-time.txt").call();
             git.commit().setMessage("added last time file to track job scheduling")
                     .setAuthor("DecodePcode", "decodepcode@noorg.com")
+                    .call();
+        }
+
+        String gitUserName = Utils.getUserName(props.getProperty("gituser"));
+        String gitUserEmail = Utils.getUserEmail(props.getProperty("gituser"));
+
+        if(props.containsKey("logChangedProjects")) {
+            git.add().addFilepattern("changed-projects").call();
+            git.commit().setMessage("updated changed-projects directory to track changed projects")
+                    .setAuthor(gitUserName, gitUserEmail)
                     .call();
         }
 

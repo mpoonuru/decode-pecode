@@ -1385,7 +1385,7 @@ from PSSQLDEFN d, PSSQLTEXTDEFN td where d.SQLID=td.SQLID
 
 	public static void extractLastChangedProjects(Properties props) {
 		try {
-			String fileName= UUID.randomUUID().toString();
+			String fileName= UUID.randomUUID().toString() + ".json";
 			FileProcessor processor = new FileProcessor(props.getProperty("gitdir"), fileName, "changed-projects");
 			Processor projectProcessor = new Processor(getJDBCconnection(""), lastTimeTimeStamp, props, processor);
 			projectProcessor.process();

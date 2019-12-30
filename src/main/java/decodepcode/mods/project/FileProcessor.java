@@ -29,7 +29,7 @@ public class FileProcessor {
     }
 
     private String getFilePath() {
-        return getDirPath() + File.separator + fileName + ".json";
+        return getDirPath() + File.separator + fileName;
     }
 
     private String getRecentFilePath() {
@@ -46,7 +46,7 @@ public class FileProcessor {
     public void saveFile(String[] content) throws IOException {
         createProjectsChangedDir();
         FileWriter writer = new FileWriter(getFilePath());
-        Revision revision = new Revision(fileName, content);
+        Revision revision = new Revision(fileName.split("\\.")[0], content);
         writer.write(revision.toString());
         writer.close();
 
