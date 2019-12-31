@@ -37,8 +37,6 @@ public class Processor {
 
     public void process() throws SQLException, IOException {
         String [] projects = fetchChangedProjects();
-        if (projects.length > 0) {
-            fileProcessor.saveFile(projects);
-        }
+        fileProcessor.saveFile(projects);
     }
 }
