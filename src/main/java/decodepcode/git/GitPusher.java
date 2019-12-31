@@ -50,7 +50,9 @@ public class GitPusher {
         if(props.containsKey("logChangedProjects")) {
             String fileName = props.getProperty("changedProjectFileName");
             git.add().addFilepattern("changed-projects").call();
-            git.add().addFilepattern(fileName).call();
+            if (fileName != null) {
+                git.add().addFilepattern(fileName).call();
+            }
             try {
                 git.commit().setMessage("updated projects file to track changed projects")
                         .setAuthor(gitUserName, gitUserEmail)
