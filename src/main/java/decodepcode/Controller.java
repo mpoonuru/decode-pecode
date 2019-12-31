@@ -1304,7 +1304,7 @@ from PSSQLDEFN d, PSSQLTEXTDEFN td where d.SQLID=td.SQLID
 				String timeOffset = null;
 				try {
 					d = ProjectReader.df2.parse(line);
-					timeOffset = props.getProperty("last-time-offset");
+					timeOffset = props.getProperty("lastTimeOffset");
 					if (timeOffset != null) {
 						d = new Date(d.getTime() - Long.parseLong(timeOffset) * 60 * 1000);
 					}
@@ -1353,7 +1353,7 @@ from PSSQLDEFN d, PSSQLTEXTDEFN td where d.SQLID=td.SQLID
 		br.close();
 		String timeOffset = null;
 		Date d = ProjectReader.df2.parse(line);
-		timeOffset = props.getProperty("last-time-offset");
+		timeOffset = props.getProperty("lastTimeOffset");
 		if (timeOffset != null) {
 			d = new Date(d.getTime() - Long.parseLong(timeOffset) * 60 * 1000);
 		}
