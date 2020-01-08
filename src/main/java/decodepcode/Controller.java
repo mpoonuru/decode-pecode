@@ -2,6 +2,7 @@ package decodepcode;
 
 import decodepcode.JDBCPeopleCodeContainer.KeySet;
 import decodepcode.JDBCPeopleCodeContainer.StoreInList;
+import decodepcode.git.GitCustomCommitter;
 import decodepcode.git.GitPusher;
 import decodepcode.mods.project.FileProcessor;
 import decodepcode.mods.project.Processor;
@@ -1373,6 +1374,16 @@ from PSSQLDEFN d, PSSQLTEXTDEFN td where d.SQLID=td.SQLID
 		}
 	}
 
+	public static void commitGeneratedFiles(Properties props) {
+		String gitFolderPath = props.getProperty("gitdir");
+		try {
+			GitCustomCommitter committer = new GitCustomCommitter(gitFolderPath);
+			committer.commit(props);
+		} catch (IOException | GitAPIException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public static void extractLastChangedProjects(Properties props) {
 		if (props.containsKey("logChangedProjects")) {
 			String uuid = UUID.randomUUID().toString();
@@ -1403,6 +1414,7 @@ from PSSQLDEFN d, PSSQLTEXTDEFN td where d.SQLID=td.SQLID
 	{
 		extractCode(a);
 		extractLastChangedProjects(props);
+		commitGeneratedFiles(props);
 		pushCode(props);
 	}
 }
