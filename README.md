@@ -29,12 +29,12 @@ select rights on PSPCMPROG PSPCMNAME PSSQLDEFN PSSQLTEXTDEFN PSPROJECTITEM PSPAC
 ## 1. Gradle Project
 - Added gradle build tool to java project
 - Written tasks to generate lib-jar and fat-jar files for the project.
-- Added auto-publishing to bintray public repository.
+- Added auto-publishing functionality to bintray public repository.
 
 ## 2. Environment Variable Support 
 - Added environment variable passing functionality from the shell
 - Made in co-ordination with properties file.
-i.e. Priority will be given to variables from passed from environment.
+i.e. Priority will be given to variables passed from environment.
 
 ## 3. Custom Git Committer
 - Added custom Git committer to commit extra necessary files, that needs to be versioned.
@@ -52,3 +52,5 @@ i.e. Priority will be given to variables from passed from environment.
 
 # Bug Fixes
 - Fixed empty commits issue.
+
+#### Note - For enhancements or bugs tracking, look at issues section :)
