@@ -53,7 +53,8 @@ public class Controller {
 	static String oprid = null;
 	static boolean onlyCustom = false;
 	static File lastTimeFile;
-	static Timestamp lastTimeTimeStamp;
+	static Date currentRunTimeStamp;
+	static Timestamp lastRunTimeStamp;
 	private static Set<String> recsProcessed = new HashSet<>(); // for SQL and CONT IDs
 	private static Map<String, CONTobject> contMap = new HashMap<>(); // for CONT objects
 
@@ -64,7 +65,8 @@ public class Controller {
 		{
 			props= readProperties();
 			lastTimeFile= getLastFile(props);
-			lastTimeTimeStamp = getLastTimeTimeStamp();
+			currentRunTimeStamp = new Date();
+			lastRunTimeStamp = getLastRunTimeStamp();
 			getContentHtml = "true".equalsIgnoreCase(props.getProperty("getContentHtml"));
 			getContentImage = "true".equalsIgnoreCase(props.getProperty("getContentImage"));
 			saveCodeInfo = "true".equalsIgnoreCase(props.getProperty("saveCodeInfo"));
@@ -1040,7 +1042,7 @@ from PSSQLDEFN d, PSSQLTEXTDEFN td where d.SQLID=td.SQLID
 		if (oprid == null)
 		{
 			FileWriter f = new FileWriter(lastTimeFile);
-			f.write(ProjectReader.df2.format(new Date()));
+			f.write(ProjectReader.df2.format(currentRunTimeStamp));
 			f.close();
 		}
 		String whereClause = " where LASTUPDDTTM > ?";
@@ -1348,7 +1350,7 @@ from PSSQLDEFN d, PSSQLTEXTDEFN td where d.SQLID=td.SQLID
 	}
 
 
-	public static Timestamp getLastTimeTimeStamp() throws ParseException, IOException {
+	public static Timestamp getLastRunTimeStamp() throws ParseException, IOException {
 		BufferedReader br = new BufferedReader(new FileReader(lastTimeFile));
 		String line = br.readLine();
 		br.close();
@@ -1391,13 +1393,13 @@ from PSSQLDEFN d, PSSQLTEXTDEFN td where d.SQLID=td.SQLID
 				if (props.containsKey("changedProjectFileName")) {
 						String fileName = props.getProperty("changedProjectFileName");
 						FileProcessor processor = new FileProcessor(props.getProperty("gitdir"), fileName,  uuid, null);
-						Processor projectProcessor = new Processor(getJDBCconnection(""), lastTimeTimeStamp, props, processor);
+						Processor projectProcessor = new Processor(getJDBCconnection(""), lastRunTimeStamp, props, processor);
 						projectProcessor.process();
 
 				} else {
 						String fileName =  uuid + ".json";
 						FileProcessor processor = new FileProcessor(props.getProperty("gitdir"), fileName, uuid, "changed-projects");
-						Processor projectProcessor = new Processor(getJDBCconnection(""), lastTimeTimeStamp, props, processor);
+						Processor projectProcessor = new Processor(getJDBCconnection(""), lastRunTimeStamp, props, processor);
 						projectProcessor.process();
 				}
 			} catch (SQLException e) {
